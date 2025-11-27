@@ -1,0 +1,6 @@
+com\nosdrg\SoundManager.class
+com\nosdrg\FakeApp.class
+com\nosdrg\App.class
+com\nosdrg\MenuSceneController.class
+com\nosdrg\KeySound.class
+com\nosdrg\GlobalKeyListener.class

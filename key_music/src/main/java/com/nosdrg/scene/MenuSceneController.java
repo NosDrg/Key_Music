@@ -1,9 +1,16 @@
-package com.nosdrg;
+package com.nosdrg.scene;
 
 import java.io.File;
 import java.net.URL;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import com.nosdrg.ConfigManager;
+import com.nosdrg.manager.SoundManager;
+import com.nosdrg.model.KeyConfig;
+import com.nosdrg.model.KeySound;
+
 import javafx.fxml.Initializable;
 
 import javafx.fxml.FXML;
@@ -29,14 +36,10 @@ public class MenuSceneController implements Initializable {
     @FXML
     @Override
     public void initialize(URL url, ResourceBundle resources) {
-        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            SoundManager.getInstance().setVolumeValue(newVal.intValue());
-        });
-
         keyNameColumn.setCellValueFactory(cellData -> cellData.getValue().keyNameProperty());
         soundNameColumn.setCellValueFactory(cellData -> cellData.getValue().soundNameProperty());
 
-        loadInitialData();
+        loadAndApplyConfig();
 
         keySoundTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -48,27 +51,54 @@ public class MenuSceneController implements Initializable {
         });
     }
 
-    private void loadInitialData() {
+    private final ConfigManager configManager = new ConfigManager();
+
+    private void loadAndApplyConfig() {
         keySoundList = FXCollections.observableArrayList();
-        keySoundList.add(new KeySound("Default", "click.wav", "D:/Folder/Java/Key_Music/key_music/src/main/resources/com/nosdrg/sounds/click.wav"));        
-        keySoundList.add(new KeySound("Enter", "click.wav", "D:/Folder/Java/Key_Music/key_music/src/main/resources/com/nosdrg/sounds/click.wav"));        
+        
+        // 1. Tạo danh sách phím mặc định (Khung sườn)
+        String[] defaultKeys = {"Space", "Enter", "Backspace", "A", "S", "D", "W", "Default"};
+        
+        // 2. Load cấu hình đã lưu từ file
+        List<KeyConfig> savedConfigs = configManager.loadConfig();
+
+        if (savedConfigs == null) {
+            savedConfigs = new ArrayList<>(); // Nếu null thì biến nó thành rỗng
+        }
+
+        for (String key : defaultKeys) {
+            String path = "";
+            String name = "Chưa đặt";
+
+            // Kiểm tra xem phím này có trong file save không
+            for (KeyConfig cfg : savedConfigs) {
+                if (cfg.getKey().equals(key)) {
+                    path = cfg.getPath();
+                    name = new java.io.File(path).getName(); // Lấy tên file cho đẹp
+                    
+                    // QUAN TRỌNG: Nạp ngay vào SoundManager để gõ là có tiếng luôn
+                    SoundManager.getInstance().updateKeySound(key, path);
+                    break;
+                }
+            }
+            keySoundList.add(new KeySound(key, name, path));
+        }
 
         keySoundTable.setItems(keySoundList);
     }
 
     @FXML
     private void saveButtonClicked() {
-        KeySound selected = keySoundTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            SoundManager.getInstance().updateKeySound(selected.keyNameProperty().get(), selected.getSoundFilePath());
-            System.out.println("Đã lưu cài đặt cho phím: " + selected.keyNameProperty().get());
-        }
+        configManager.saveConfig(keySoundList);
+        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            SoundManager.getInstance().setVolumeValue(newVal.intValue());
+        });
     }
 
     @FXML
     private void defaultButtonClicked() {
         SoundManager.getInstance().clearAll();
-        loadInitialData();
+        loadAndApplyConfig();
         System.out.println("Đã đặt lại cài đặt mặc định.");
     }
 

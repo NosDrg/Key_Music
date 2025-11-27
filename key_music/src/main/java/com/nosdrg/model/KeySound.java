@@ -1,4 +1,4 @@
-package com.nosdrg;
+package com.nosdrg.model;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

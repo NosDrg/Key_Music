@@ -1,4 +1,4 @@
-package com.nosdrg;
+package com.nosdrg.manager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,7 @@ import javafx.scene.media.AudioClip;
 
 public class SoundManager {
     private static SoundManager instance;
-    private int volumeValue = 50;
+    private double volumeValue = 50;
 
     public static SoundManager getInstance() {
         if (instance == null) {
@@ -29,7 +29,6 @@ public class SoundManager {
                 String url = "file:///" + filePath.replace("\\", "/"); 
                 AudioClip clip = new AudioClip(url);
                 fileCache.put(filePath, clip);
-                System.out.println("Đã load file mới vào cache: " + filePath);
             } catch (Exception e) {
                 System.err.println("Lỗi load file: " + filePath);
                 return;
@@ -56,13 +55,12 @@ public class SoundManager {
         fileCache.clear();
     }
 
-    public int getVolumeValue() {
+    public double getVolumeValue() {
         return volumeValue;
     }
 
-    public void setVolumeValue(int volumeValue) {
+    public void setVolumeValue(double volumeValue) {
         this.volumeValue = volumeValue;
     }
-
     
 }

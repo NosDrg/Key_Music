@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 
+import com.nosdrg.listener.GlobalKeyListener;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,7 +19,7 @@ import javafx.stage.Stage;
 public final class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/nosdrg/MenuScene.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/nosdrg/scene/MenuScene.fxml"));
         Parent root = loader.load();
     
         Scene scene;
@@ -32,6 +34,19 @@ public final class App extends Application {
         setupJNativeHook();
         // ... Code load SoundManager và JNativeHook giữ nguyên ...
         
+        try {
+            GlobalScreen.registerNativeHook();
+            // Tắt log rác
+            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
+            logger.setLevel(java.util.logging.Level.OFF);
+            logger.setUseParentHandlers(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Đăng ký class xử lý phím (Class mà mình đã hướng dẫn bạn sửa để gọi SoundManager ấy)
+        GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
+
         // 3. Ẩn hiện Tray Icon (giữ nguyên logic cũ của bạn)
         
         primaryStage.show();
@@ -51,6 +66,12 @@ public final class App extends Application {
             ex.printStackTrace();
         }
     }
+
+    // @Override
+    // public void stop() throws Exception {
+    //     GlobalScreen.unregisterNativeHook();
+    //     super.stop();
+    // }
 
     public static void main(String[] args) {
         launch(args);
