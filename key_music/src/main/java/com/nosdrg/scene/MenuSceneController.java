@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import com.nosdrg.ConfigManager;
+import com.nosdrg.listener.GlobalKeyListener;
 import com.nosdrg.manager.SoundManager;
 import com.nosdrg.model.KeyConfig;
 import com.nosdrg.model.KeySound;
@@ -15,6 +16,7 @@ import javafx.fxml.Initializable;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
@@ -24,8 +26,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class MenuSceneController implements Initializable {
+    @FXML private Label textLabel;
     @FXML private Button SaveButton;
     @FXML private Button DefaultButton;
+    @FXML private Button btnAddKey;
+    @FXML private Button btnRemoveKey;
     @FXML private Slider volumeSlider;
     @FXML private TableView<KeySound> keySoundTable;
     @FXML private TableColumn<KeySound, String> keyNameColumn;
@@ -122,5 +127,67 @@ public class MenuSceneController implements Initializable {
             // 2. Cập nhật SoundManager (Logic)
             SoundManager.getInstance().updateKeySound(row.getKeyName(), selectedFile.getAbsolutePath());
         }
+    }
+
+    @FXML
+    public void onAddKeyClicked() {
+        // 1. Đổi giao diện để báo hiệu đang chờ
+        textLabel.setVisible(true);
+        btnAddKey.setDisable(true); // Khóa nút lại để không bấm lung tung
+        btnAddKey.setText("......");
+        // 2. Kích hoạt chế độ bắt phím bên KeyHandler
+        GlobalKeyListener.setCaptureMode((newKeyName) -> {
+            // Đây là đoạn code sẽ chạy SAU KHI bạn nhấn phím xong
+            
+            // Kiểm tra xem phím này đã có trong bảng chưa
+            boolean exists = keySoundList.stream()
+                    .anyMatch(item -> item.getKeyName().equals(newKeyName));
+
+            if (exists) {
+                System.out.println("Phím " + newKeyName + " đã tồn tại!");
+            } else {
+                // Thêm vào bảng với âm thanh mặc định (hoặc rỗng)
+                KeySound newItem = new KeySound(newKeyName, "Chưa đặt", "");
+                keySoundList.add(newItem);
+                
+                // Cuộn bảng xuống dòng cuối cùng cho dễ nhìn
+                keySoundTable.scrollTo(newItem);
+                keySoundTable.getSelectionModel().select(newItem);
+                
+                configManager.saveConfig(keySoundList);
+            }
+
+            // 3. Trả lại trạng thái cũ cho nút bấm
+            textLabel.setVisible(false);
+            btnAddKey.setText("Add Key");
+            btnAddKey.setDisable(false);
+        });
+    }
+
+    @FXML
+    public void onRemoveClicked() {
+        textLabel.setVisible(true);
+        btnRemoveKey.setDisable(true); // Khóa nút lại để không bấm lung tung
+        btnRemoveKey.setText("......");
+        // 2. Kích hoạt chế độ bắt phím bên KeyHandler
+        GlobalKeyListener.setCaptureMode((newKeyName) -> {
+            // Đây là đoạn code sẽ chạy SAU KHI bạn nhấn phím xong
+            
+            // Kiểm tra xem phím này đã có trong bảng chưa
+            boolean exists = keySoundList.removeIf(item -> item.getKeyName().equals(newKeyName));
+
+            if (exists) {
+                SoundManager.getInstance().removeKeySound(newKeyName);
+
+                configManager.saveConfig(keySoundList);
+            } else {                
+                System.out.println("Phím " + newKeyName + " không tồn tại!");
+            }
+
+            // 3. Trả lại trạng thái cũ cho nút bấm
+            textLabel.setVisible(false);
+            btnRemoveKey.setText("Remove Key");
+            btnRemoveKey.setDisable(false);
+        });
     }
 }

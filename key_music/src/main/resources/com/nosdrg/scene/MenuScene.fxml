@@ -6,23 +6,36 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 
 <StackPane fx:id="stackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nosdrg.scene.MenuSceneController">
    <children>
-      <AnchorPane fx:id="anchorPane" prefHeight="200.0" prefWidth="200.0">
+      <AnchorPane fx:id="anchorPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: lightgray;">
          <children>
             <Slider fx:id="volumeSlider" layoutX="358.0" layoutY="85.0" value="50.0" />
-            <Button fx:id="saveButton" layoutX="180.0" layoutY="233.0" mnemonicParsing="false" onAction="#saveButtonClicked" text="Save" />
-            <Button fx:id="defaultButton" layoutX="303.0" layoutY="233.0" mnemonicParsing="false" onAction="#defaultButtonClicked" text="Default" />
+            <HBox layoutX="309.0" layoutY="164.0" prefHeight="100.0" prefWidth="200.0" />
+            <Button fx:id="saveButton" layoutX="328.0" layoutY="201.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#saveButtonClicked" prefHeight="20.0" prefWidth="60.0" text="Save" />
+            <Button fx:id="defaultButton" layoutX="438.0" layoutY="201.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#defaultButtonClicked" prefHeight="20.0" prefWidth="60.0" text="Default" />
             <TableView fx:id="keySoundTable" fixedCellSize="0.0" layoutX="36.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0">
               <columns>
                 <TableColumn fx:id="keyNameColumn" prefWidth="70.0" text="Key" />
                 <TableColumn fx:id="soundNameColumn" prefWidth="130.0" text="Sound" />
               </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
             </TableView>
             <Label layoutX="300.0" layoutY="84.0" text="Volume" />
+            <HBox alignment="CENTER" layoutX="38.0" layoutY="214.0" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="btnAddKey" mnemonicParsing="false" onAction="#onAddKeyClicked" prefHeight="20.0" prefWidth="90.0" text="Add Key" />
+                  <Button fx:id="btnRemoveKey" mnemonicParsing="false" onAction="#onRemoveClicked" prefHeight="20.0" prefWidth="90.0" text="Remove Key" />
+               </children>
+            </HBox>
+            <Label fx:id="textLabel" alignment="CENTER" layoutX="65.0" layoutY="218.0" prefHeight="18.0" prefWidth="140.0" text="Click any key..." visible="false" />
          </children>
+         
       </AnchorPane>
    </children>
 </StackPane>

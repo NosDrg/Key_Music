@@ -50,6 +50,13 @@ public class SoundManager {
         return null;
     }
 
+    public void removeKeySound(String keyName) {
+        String path = keyMap.get(keyName);
+
+        keyMap.remove(keyName);
+        fileCache.remove(path);
+    }
+
     public void clearAll() {
         keyMap.clear();
         fileCache.clear();

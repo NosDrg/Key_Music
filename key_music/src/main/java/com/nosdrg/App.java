@@ -31,6 +31,8 @@ public final class App extends Application {
         primaryStage.setTitle("MechKey Sound");
         primaryStage.setScene(scene);
         
+        primaryStage.setResizable(false);
+
         setupJNativeHook();
         // ... Code load SoundManager và JNativeHook giữ nguyên ...
         
