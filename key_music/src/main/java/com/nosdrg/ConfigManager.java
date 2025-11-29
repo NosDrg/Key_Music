@@ -60,8 +60,7 @@ public class ConfigManager {
             return list;
         } catch (IOException e) {
             e.printStackTrace();
-            // SAI: return null;
-            // ĐÚNG:
+            // Nếu có lỗi đọc file, trả về danh sách rỗng
             return new ArrayList<>();
         }
     }

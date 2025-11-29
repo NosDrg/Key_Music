@@ -3,6 +3,7 @@ package com.nosdrg.model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+// Lớp mô hình cho dữ liệu hiển thị trong bảng (TableView)
 public class KeySound {
     private final StringProperty keyName;
     private final StringProperty soundName; 

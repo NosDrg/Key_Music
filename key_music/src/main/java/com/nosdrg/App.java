@@ -28,7 +28,7 @@ public final class App extends Application {
         } else {
             scene = new Scene(root);
         }
-        primaryStage.setTitle("MechKey Sound");
+        primaryStage.setTitle("Key Music");
         primaryStage.setScene(scene);
         
         primaryStage.setResizable(false);

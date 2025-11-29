@@ -14,6 +14,7 @@ import com.nosdrg.manager.SoundManager;
 import javafx.application.Platform;
 import javafx.scene.media.AudioClip;
 
+// Lớp lắng nghe phím toàn cục và phát âm thanh tương ứng
 public class GlobalKeyListener implements NativeKeyListener {
     private final Set<Integer> pressedKeys = new HashSet<>();
 
@@ -23,21 +24,18 @@ public class GlobalKeyListener implements NativeKeyListener {
         captureCallback = callback;
     }
 
+    // Phương thức xử lý khi phím được nhấn
     @Override
     public void nativeKeyPressed(NativeKeyEvent e) {
         int keyCode = e.getKeyCode();
         String keyText = NativeKeyEvent.getKeyText(keyCode);
-        AudioClip clipToPlay = SoundManager.getInstance().getClip(keyText);
         
         if (pressedKeys.contains(keyCode)) {
             return;
         }
 
         pressedKeys.add(keyCode);
-        if (clipToPlay != null) {
-            clipToPlay.play(SoundManager.getInstance().getVolumeValue() / 100.0);
-            System.out.println("Playing sound for key: " + keyText);
-        }
+        SoundManager.getInstance().playSound(keyText);
 
         if (captureCallback != null) {
             Consumer<String> tempCallback = captureCallback;

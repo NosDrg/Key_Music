@@ -1,5 +1,6 @@
 package com.nosdrg.scene;
 
+import java.awt.RenderingHints;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class MenuSceneController implements Initializable {
     @FXML private Button btnAddKey;
     @FXML private Button btnRemoveKey;
     @FXML private Slider volumeSlider;
+    @FXML private Slider pitchSlider;
+    @FXML private Slider balanceSlider;
     @FXML private TableView<KeySound> keySoundTable;
     @FXML private TableColumn<KeySound, String> keyNameColumn;
     @FXML private TableColumn<KeySound, String> soundNameColumn;
@@ -41,11 +44,14 @@ public class MenuSceneController implements Initializable {
     @FXML
     @Override
     public void initialize(URL url, ResourceBundle resources) {
+        // Thiết lập giao diện
+        textLabel.setVisible(false);
         keyNameColumn.setCellValueFactory(cellData -> cellData.getValue().keyNameProperty());
         soundNameColumn.setCellValueFactory(cellData -> cellData.getValue().soundNameProperty());
 
         loadAndApplyConfig();
 
+        // Mở file chọn âm thanh khi click đúp vào dòng
         keySoundTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 KeySound selectedRow = keySoundTable.getSelectionModel().getSelectedItem();
@@ -62,13 +68,22 @@ public class MenuSceneController implements Initializable {
         keySoundList = FXCollections.observableArrayList();
         
         // 1. Tạo danh sách phím mặc định (Khung sườn)
-        String[] defaultKeys = {"Space", "Enter", "Backspace", "A", "S", "D", "W", "Default"};
+        String[] defaultKeys = {};
         
         // 2. Load cấu hình đã lưu từ file
         List<KeyConfig> savedConfigs = configManager.loadConfig();
 
         if (savedConfigs == null) {
             savedConfigs = new ArrayList<>(); // Nếu null thì biến nó thành rỗng
+        }
+
+        // 3. Duyệt qua danh sách phím mặc định và kiểm tra xem có trong file save không
+        for (KeyConfig cfg : savedConfigs) {
+            if (!keySoundList.stream().anyMatch(item -> item.getKeyName().equals(cfg.getKey()))) {
+                // Nếu phím này chưa có trong danh sách, thêm vào
+                defaultKeys = java.util.Arrays.copyOf(defaultKeys, defaultKeys.length + 1);
+                defaultKeys[defaultKeys.length - 1] = cfg.getKey();
+            }
         }
 
         for (String key : defaultKeys) {
@@ -92,11 +107,20 @@ public class MenuSceneController implements Initializable {
         keySoundTable.setItems(keySoundList);
     }
 
+    // Save button clicked
     @FXML
     private void saveButtonClicked() {
         configManager.saveConfig(keySoundList);
         volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             SoundManager.getInstance().setVolumeValue(newVal.intValue());
+        });
+
+        pitchSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            SoundManager.getInstance().setPitchValue(newVal.doubleValue());
+        });
+
+        balanceSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            SoundManager.getInstance().setBalanceValue(newVal.doubleValue());
         });
     }
 
@@ -135,6 +159,14 @@ public class MenuSceneController implements Initializable {
         textLabel.setVisible(true);
         btnAddKey.setDisable(true); // Khóa nút lại để không bấm lung tung
         btnAddKey.setText("......");
+
+        if (btnRemoveKey != null) {
+            btnRemoveKey.setDisable(true);
+        }
+        SaveButton.setDisable(true);
+        DefaultButton.setDisable(true);
+        keySoundTable.setDisable(true);
+
         // 2. Kích hoạt chế độ bắt phím bên KeyHandler
         GlobalKeyListener.setCaptureMode((newKeyName) -> {
             // Đây là đoạn code sẽ chạy SAU KHI bạn nhấn phím xong
@@ -161,14 +193,30 @@ public class MenuSceneController implements Initializable {
             textLabel.setVisible(false);
             btnAddKey.setText("Add Key");
             btnAddKey.setDisable(false);
+
+            if (btnRemoveKey != null) {
+                btnRemoveKey.setDisable(false);
+            }
+            SaveButton.setDisable(false);
+            DefaultButton.setDisable(false);
+            keySoundTable.setDisable(false);
         });
     }
 
     @FXML
     public void onRemoveClicked() {
+        // 1. Đổi giao diện để báo hiệu đang chờ
         textLabel.setVisible(true);
         btnRemoveKey.setDisable(true); // Khóa nút lại để không bấm lung tung
         btnRemoveKey.setText("......");
+
+        if (btnAddKey != null) {
+            btnAddKey.setDisable(true);
+        }
+        SaveButton.setDisable(true);
+        DefaultButton.setDisable(true);
+        keySoundTable.setDisable(true);
+
         // 2. Kích hoạt chế độ bắt phím bên KeyHandler
         GlobalKeyListener.setCaptureMode((newKeyName) -> {
             // Đây là đoạn code sẽ chạy SAU KHI bạn nhấn phím xong
@@ -188,6 +236,13 @@ public class MenuSceneController implements Initializable {
             textLabel.setVisible(false);
             btnRemoveKey.setText("Remove Key");
             btnRemoveKey.setDisable(false);
+            
+            keySoundTable.setDisable(false);
+            if (btnAddKey != null) {
+                btnAddKey.setDisable(false);
+            }
+            SaveButton.setDisable(false);
+            DefaultButton.setDisable(false);
         });
     }
 }

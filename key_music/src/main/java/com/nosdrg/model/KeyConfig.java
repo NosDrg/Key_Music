@@ -1,5 +1,6 @@
 package com.nosdrg.model;
 
+// Lớp mô hình cho cấu hình phím và đường dẫn file âm thanh
 public class KeyConfig {
     private String key;
     private String path; // Đường dẫn file âm thanh
