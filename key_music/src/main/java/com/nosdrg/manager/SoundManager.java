@@ -26,35 +26,62 @@ public class SoundManager {
 
     // --- 1. HÀM CẬP NHẬT KHI NGƯỜI DÙNG CHỌN FILE TỪ UI ---
     public void updateKeySound(String keyName, String filePath) {
-        // Nếu file chưa từng load, thì load vào cache
-        if (!fileCache.containsKey(filePath)) {
-            try {
-                // Logic load file từ ổ cứng (khác với load từ Resource trong JAR)
-                // Phải thêm "file:/" ở trước đường dẫn tuyệt đối
-                String url = "file:///" + filePath.replace("\\", "/"); 
-                AudioClip clip = new AudioClip(url);
-                fileCache.put(filePath, clip);
-            } catch (Exception e) {
-                System.err.println("Lỗi load file: " + filePath);
-                return;
-            }
+        if (filePath == null || filePath.trim().isEmpty()) {
+            keyMap.put(keyName, "Don't set");
+            return;
         }
-        
-        keyMap.put(keyName, filePath);
-        System.out.println("Đã cập nhật phím " + keyName + " -> " + filePath);
+
+        // 1. Kiểm tra Cache trước (Tối ưu hiệu năng)
+        if (fileCache.containsKey(filePath)) {
+            keyMap.put(keyName, filePath);
+            return; 
+        }
+
+        try {
+            String finalUrl;
+
+            // 2. Thử tìm trong JAR trước (Resource nội bộ)
+            java.net.URL resourceUrl = getClass().getResource(filePath);
+            
+            if (resourceUrl != null) {
+                // -> Trường hợp 1: File nằm trong JAR
+                finalUrl = resourceUrl.toExternalForm();
+            } else {
+                // -> Trường hợp 2: File nằm ngoài ổ cứng (External)
+                java.io.File externalFile = new java.io.File(filePath);
+                
+                if (!externalFile.exists()) {
+                    System.err.println("File không tồn tại: " + filePath);
+                    return;
+                }
+                
+                // Nó tự xử lý các ký tự đặc biệt như dấu cách (Space -> %20)
+                finalUrl = externalFile.toURI().toString();
+            }
+
+            // 3. Load và Cache
+            AudioClip clip = new AudioClip(finalUrl);
+            fileCache.put(filePath, clip);
+            
+            // 4. Map phím vào đường dẫn
+            keyMap.put(keyName, filePath);
+            
+            System.out.println("Đã load (" + keyName + "): " + filePath);
+
+        } catch (Exception e) {
+            System.err.println("Lỗi format âm thanh: " + filePath);
+            e.printStackTrace();
+        }
     }
 
 
-    // --- 2. HÀM LẤY CLIP THEO TÊN PHÍM ---
+    // --- 2. HÀM LẤY CLIP 
+    // THEO TÊN PHÍM ---
     // Trả về AudioClip tương ứng với tên phím
     public AudioClip getClip(String keyName) {
         String path = keyMap.get(keyName);
-        
         if (path == null) path = keyMap.get("Default");
-        
-        if (path != null) {
-            return fileCache.get(path);
-        }
+        if (path != null) return fileCache.get(path);
         return null;
     }
 
@@ -74,16 +101,14 @@ public class SoundManager {
     // --- 5. HÀM PHÁT ÂM THANH THEO TÊN PHÍM ---
     public void playSound(String keyName) {
         AudioClip clip = getClip(keyName);
+
         if (clip != null) {
             double rate = 1;
             double balance = 0;
-            if (pitchValue > 0) {
-            rate = 1 + 2 * Math.random() * pitchValue - pitchValue;
-            }
-            if (balanceValue > 0) {
-            balance = Math.random() * 0.5;
-            }
-            clip.play(volumeValue / 100.0, balance, rate, 0, 1);
+            if (pitchValue > 0) rate = 1 + 2 * Math.random() * pitchValue - pitchValue;
+            if (balanceValue > 0) balance = Math.random() * 0.5;
+            System.out.println("Playing sound for key: " + keyName + " | Volume: " + volumeValue + " | Balance: " + balance + " | Rate: " + rate);
+            clip.play(volumeValue, balance, rate, 0, 1);
         }
     }
 

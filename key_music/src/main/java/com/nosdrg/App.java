@@ -6,35 +6,38 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
 
 import com.nosdrg.listener.GlobalKeyListener;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public final class App extends Application {
+    private static Stage stage;
+
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage stage) throws Exception {
+        this.stage = stage;
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/nosdrg/scene/MenuScene.fxml"));
         Parent root = loader.load();
     
         Scene scene;
-        if (primaryStage.getScene() != null) {
-            scene = new Scene(root, primaryStage.getScene().getWidth(), primaryStage.getScene().getHeight());
+        if (stage.getScene() != null) {
+            scene = new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight());
         } else {
             scene = new Scene(root);
         }
-        primaryStage.setTitle("Key Music");
-        primaryStage.setScene(scene);
+        stage.setTitle("Key Music");
+        stage.setScene(scene);
         
-        primaryStage.setResizable(false);
+        stage.setResizable(false);
 
         setupJNativeHook();
-        // ... Code load SoundManager và JNativeHook giữ nguyên ...
         
         try {
             GlobalScreen.registerNativeHook();
@@ -46,12 +49,11 @@ public final class App extends Application {
             e.printStackTrace();
         }
 
-        // Đăng ký class xử lý phím (Class mà mình đã hướng dẫn bạn sửa để gọi SoundManager ấy)
         GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
-
-        // 3. Ẩn hiện Tray Icon (giữ nguyên logic cũ của bạn)
         
-        primaryStage.show();
+        Platform.setImplicitExit(false);
+
+        stage.show();
     }
 
     private void setupJNativeHook() {
@@ -66,6 +68,20 @@ public final class App extends Application {
             GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public static void showWindow() {
+        if (stage != null) {
+            Platform.runLater(() -> {
+                if (!stage.isShowing()) {
+                    stage.show(); // Hiện lại nếu đang ẩn
+                }
+                if (stage.isIconified()) {
+                    stage.setIconified(false); // Phục hồi nếu đang Minimized
+                }
+                stage.toFront(); // Đẩy lên trên cùng
+            });
         }
     }
 

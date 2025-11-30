@@ -6,13 +6,14 @@ import java.util.function.Consumer;
 
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import com.nosdrg.App;
 import com.nosdrg.manager.SoundManager;
 
 import javafx.application.Platform;
-import javafx.scene.media.AudioClip;
 
 // Lớp lắng nghe phím toàn cục và phát âm thanh tương ứng
 public class GlobalKeyListener implements NativeKeyListener {
@@ -29,6 +30,7 @@ public class GlobalKeyListener implements NativeKeyListener {
     public void nativeKeyPressed(NativeKeyEvent e) {
         int keyCode = e.getKeyCode();
         String keyText = NativeKeyEvent.getKeyText(keyCode);
+        System.out.println("Key Pressed: " + keyText);
         
         if (pressedKeys.contains(keyCode)) {
             return;
@@ -40,22 +42,34 @@ public class GlobalKeyListener implements NativeKeyListener {
         if (captureCallback != null) {
             Consumer<String> tempCallback = captureCallback;
 
-            // 2. Reset biến gốc về null ngay lập tức để ngừng chế độ bắt phím
+            // Reset biến gốc về null ngay lập tức để ngừng chế độ bắt phím
             captureCallback = null;
 
-            // 3. Gửi biến tạm sang JavaFX để xử lý
+            // Gửi biến tạm sang JavaFX để xử lý
             Platform.runLater(() -> tempCallback.accept(keyText));
             
-            return; // Dừng lại, không phát nhạc
+            return;
         }
 
-        if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+        // Xử lý tổ hợp phím đặc biệt
+        if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE && 
+            (e.getModifiers() & NativeInputEvent.ALT_MASK) != 0) {
+            
             try {
                 GlobalScreen.unregisterNativeHook();
                 System.exit(0);
+                System.out.println("Application Exited.");
             } catch (NativeHookException nativeHookException) {
                 nativeHookException.printStackTrace();
             }
+        }
+
+        if (e.getKeyCode() == NativeKeyEvent.VC_ENTER && 
+           (e.getModifiers() & NativeInputEvent.CTRL_MASK) != 0) {
+            
+            System.out.println("Opening Application Window.");
+            App.showWindow();
+            return;
         }
     }
 

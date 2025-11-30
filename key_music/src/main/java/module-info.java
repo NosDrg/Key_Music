@@ -15,10 +15,10 @@ module com.nosdrg {
 
     // 4. Mở quyền truy cập
     // Cho phép FXML đọc Controller
-    opens com.nosdrg.scene to javafx.fxml; // (Sửa package này nếu Controller bạn để chỗ khác)
+    opens com.nosdrg.scene to javafx.fxml;
     
     // Cho phép Gson đọc Model (KeyConfig)
-    opens com.nosdrg.model to com.google.gson; // (Sửa package này nếu Model bạn để chỗ khác)
+    opens com.nosdrg.model to com.google.gson, javafx.base;
 
     // Xuất module chính để JavaFX chạy được
     exports com.nosdrg;
