@@ -1,6 +1,10 @@
 D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\App.java
-D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\FakeApp.java
-D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\GlobalKeyListener.java
-D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\KeySound.java
-D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\MenuSceneController.java
-D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\SoundManager.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\AppLauncher.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\listener\GlobalKeyListener.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\manager\ConfigManager.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\manager\PackManager.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\manager\SoundManager.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\model\GlobalConfig.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\model\KeyConfig.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\model\KeySound.java
+D:\Folder\Java\Key_Music\key_music\src\main\java\com\nosdrg\scene\MenuSceneController.java
